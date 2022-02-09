@@ -1,16 +1,13 @@
-# This is a sample Python script.
+import pydobot
+from serial.tools import list_ports
 
-# Press Maj+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+if __name__ == "__main__":
+    print("Starting robot")
 
+    available_ports = list_ports.comports()
+    print(f"available ports: {[x.device for x in available_ports]}")
+    port = available_ports[0].device
+    device = pydobot.Dobot(port=port, verbose=True)
+    device.close()
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    
