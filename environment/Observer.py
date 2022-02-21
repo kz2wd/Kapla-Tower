@@ -1,7 +1,8 @@
 from data_struct.Kapla import *
 from data_struct.General import *
 from System import System
-from data_struct.Kapla import RealKapla
+from data_struct.Kapla import *
+from data_struct.Kapla import RealKapla, GoalKapla
 
 
 class Observer:
@@ -19,6 +20,9 @@ class Observer:
 
         return RealKapla(System.shop_pos, 0, Faces.big_face)
 
-    def get_real_kapla_pos(self, kapla: RealKapla) -> Position:
+    def get_real_kapla_pos(self, kapla: RealKapla) -> GoalKapla:
         # Todo
-        return Position(0, 0, 0)
+        # Find a kapla near the supposed position of the furnished RealKapla
+        # Do not use RealKapla.get_grab_position(), as it call this function
+
+        return GoalKapla(Position(0, 0, 0), 0, Faces.big_face)

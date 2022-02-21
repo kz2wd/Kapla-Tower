@@ -18,6 +18,10 @@ class System:
         System.world_watcher = Observer(cam)
 
     def start(self):
+
+        # Todo : Get Kapla sequence using KaplaOrganizer
+        # Todo : For each Kapla in the sequence : request a new kapla,
+
         pass
 
     def request_new_kapla(self) -> RealKapla:

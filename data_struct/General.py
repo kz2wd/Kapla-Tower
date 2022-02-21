@@ -12,6 +12,7 @@ class Position:
         return Position(self.x, self.y, self.z)
 
 
+# Check KaplaManual in resources if you don't understand theses
 class Faces:
     big_face = "big_face"
     medium_face = "medium_face"

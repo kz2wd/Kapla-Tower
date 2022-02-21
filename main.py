@@ -19,6 +19,7 @@ if __name__ == "__main__":
     cam = 0
 
     system = System(device1, device2, device3, cam)
+
     system.start()
 
     device1.close()
