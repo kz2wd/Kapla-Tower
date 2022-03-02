@@ -5,6 +5,7 @@ from data_struct.Kapla import *
 from data_struct.Kapla import RealKapla, GoalKapla
 
 
+# We may need a QR code like reference for the camera to get an absolute position reference
 class Observer:
     def __init__(self, cam):
         self.cam = cam
