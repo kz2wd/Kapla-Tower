@@ -22,7 +22,7 @@ class Observer:
 
     def get_real_kapla_pos(self, kapla: RealKapla) -> GoalKapla:
         # Todo
-        # Find a kapla near the supposed position of the furnished RealKapla
-        # Do not use RealKapla.get_grab_position(), as it call this function
+        # Find a kapla near the supposed position of the furnished SupposedKapla
+        # Do not use SupposedKapla.get_grab_position(), as it call this function
 
         return GoalKapla(Position(0, 0, 0), 0, Faces.big_face)
