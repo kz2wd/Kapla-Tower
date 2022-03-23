@@ -14,6 +14,9 @@ class Position:
     def __iter__(self):
         return iter((self.x, self.y, self.z))
 
+    def __str__(self) -> str:
+        return f"{self.x} {self.y} {self.z}"
+
 
 # Check KaplaManual in resources if you don't understand theses
 # active face is the one on the ground / up

@@ -20,7 +20,7 @@ def home_position(device):
 def connection():
     print('- connexion au robot ...', end='')
     sys.stdout.flush()
-    port = 'COM4'  # replacez ici COM3 par votre port de communication
+    port = 'COM3'  # replacez ici COM3 par votre port de communication
     device = Dobot(port=port)
     print('[ok]')
     sys.stdout.flush()
