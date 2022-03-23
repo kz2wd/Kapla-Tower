@@ -6,10 +6,13 @@ class Position:
 
     def get_hover(self):
         # 50 mm up
-        return Position(self.x, self.y + 50, self.z)
+        return Position(self.x, self.y, self.z + 50)
 
     def clone(self):
         return Position(self.x, self.y, self.z)
+
+    def __iter__(self):
+        return iter((self.x, self.y, self.z))
 
 
 # Check KaplaManual in resources if you don't understand theses
