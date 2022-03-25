@@ -16,7 +16,7 @@ if __name__ == "__main__":
     device1 = dobot_extensions.Dobot(port=available_ports[0].device)
     # device2 = pydobot.Dobot(port=available_ports[1].device, verbose=True)
 
-    system = System(None, device1)
+    system = System(None, device1, device1)
 
     system.start()
 

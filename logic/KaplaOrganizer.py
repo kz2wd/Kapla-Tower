@@ -60,7 +60,7 @@ def get_sequence():
 
         pos_x = ( data_tri[i]["base"][0] + ( data_tri[i]["attitude"][0]/2 ))
         pos_y = ( data_tri[i]["base"][1] + ( data_tri[i]["attitude"][1]/2 ))
-        pos_z = ( data_tri[i]["base"][2] + ( data_tri[i]["attitude"][2]/2 ))
+        pos_z = ( data_tri[i]["base"][2] + ( data_tri[i]["attitude"][2] ))
         pos.append((pos_x, pos_y, pos_z))
 
         face.append(dic_face[data_tri[i]["attitude"][2]])

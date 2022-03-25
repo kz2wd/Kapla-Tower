@@ -5,20 +5,22 @@ import dobot_extensions
 
 from logic import KaplaOrganizer
 
+tempo = 0.2
 
 class System:
     # TODO : setup pos here
     shop_pos: Position = Position(180.06, 91.33, -46.74)
-    loader_pos: Position = Position(0, 0, 0)
-    builder_pos: Position = Position(0, 0, 0)
     conveyor_pos_load: Position = Position(178.29, -36.15, 33.56)
     conveyor_pos_unload: Position = Position(189.17, 69.69, 36.42)
-    construction_pos: Position = Position(-8.00, -266.30, -49.64)
+    construction_pos: Position = Position(-2.47, -296.44, -72.85)
+    flipper_small_face: Position = Position(188.79, -74.24, -0.55)
+    flipper_big_face: Position = Position(188.04, -62.74, -12.22)
     # Add rotation piece localisation
 
-    def __init__(self, loader: dobot_extensions.Dobot, builder: dobot_extensions.Dobot):
+    def __init__(self, loader: dobot_extensions.Dobot, builder: dobot_extensions.Dobot, conveyor_handler):
         self.loader: dobot_extensions.Dobot = loader
         self.builder: dobot_extensions.Dobot = builder
+        self.conveyor_handler: dobot_extensions.Dobot = conveyor_handler
 
         # self.loader.set_home(250.0, 0.0, 100.0)
         # self.loader.wait_for_cmd(self.loader.home())
@@ -37,13 +39,26 @@ class System:
         for pos, angle, face in KaplaOrganizer.get_sequence():
             print(f"Next goal : {pos} {angle} {face}")
             # Loading part
-            # self.get_kapla_from_shop()
-            # self.loader.wait_for_cmd(self.loader.conveyor_belt_distance(100, 500, -1, 0))
+            # self.get_kapla_from_shop(face)
+
+            # Travel on conveyor
+            # self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(100, 500, -1, 0))
+
+            # Rotation
+            retaking_point = System.conveyor_pos_unload
+
+            if face == Faces.big_face:
+                retaking_point = System.flipper_big_face
+                self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(100, 100, -1, 0))
+            elif face == Faces.small_face:
+                retaking_point = System.flipper_small_face
+                self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(100, 100, -1, 0))
+
 
             midpoint = Position(151.28, -160.95, 150.53)
-            self.catch(self.builder, System.conveyor_pos_unload, [midpoint])
+            self.catch(self.builder, retaking_point, [midpoint])
 
-            obj_x, obj_y, obj_z = System.construction_pos.clone()
+            obj_x, obj_y, obj_z = System.construction_pos
             x, y, z = pos
             obj_x += x
             obj_y += y
@@ -57,10 +72,15 @@ class System:
         # for pos, angle, face in KaplaOrganizer.get_sequence():
         #     break
 
-    def get_kapla_from_shop(self):
+    def get_kapla_from_shop(self, face: Faces):
+
+        angle = 0
+        if face == Faces.small_face:
+            angle = 90
+
         midpoint = Position(186.77, 60.88, 116.95)
         self.catch(self.loader, System.shop_pos, [midpoint])
-        self.drop(self.loader, System.conveyor_pos_load, [midpoint])
+        self.drop(self.loader, System.conveyor_pos_load, [midpoint], angle)
         self.loader.wait_for_cmd(self.loader.move_to(*midpoint))
 
     def catch(self, device: dobot_extensions.Dobot, pos: Position, midpoints: list[Position], angle: float = 0):
@@ -70,10 +90,38 @@ class System:
         self.action(device, pos, False, midpoints, angle)
 
     def action(self, device: dobot_extensions.Dobot, pos: Position, suck: bool, midpoints: list[Position], angle: float = 0):
+        # for x, y, z in midpoints:
+        #     device.wait_for_cmd(device.move_to(x, y, z))
+        # time.sleep(tempo)
+        # device.wait_for_cmd(device.move_to(*(pos.get_hover())))
+        # time.sleep(tempo)
+        # device.wait_for_cmd(device.move_to(*pos, angle))
+        # time.sleep(tempo)
+        # device.wait_for_cmd(device.suck(suck))
+        # time.sleep(1)
+        # device.wait_for_cmd(device.move_to(*(pos.get_hover())))
+        # time.sleep(tempo)
+
         for x, y, z in midpoints:
             device.wait_for_cmd(device.move_to(x, y, z))
-        device.wait_for_cmd(device.move_to(*(pos.get_hover())))
-        device.wait_for_cmd(device.move_to(*pos, angle))
+        time.sleep(tempo)
+        self.my_move_to(device, pos.get_hover())
+        time.sleep(tempo)
+        self.my_move_to(device, pos, angle)
+        time.sleep(tempo)
         device.wait_for_cmd(device.suck(suck))
         time.sleep(1)
-        device.wait_for_cmd(device.move_to(*(pos.get_hover())))
+        self.my_move_to(device, pos.get_hover())
+        time.sleep(tempo)
+
+
+    def my_move_to(self, device: dobot_extensions.Dobot, pos: Position, angle: float = 0):
+        pose = device.get_pose()
+        while self.equals_poses(pose, device.get_pose()):
+            device.wait_for_cmd(device.move_to(*pos, angle))
+
+    def equals_poses(self, pose1, pose2, tolerance=2):
+        for arg1, arg2 in zip(pose1.position, pose2.position):
+            if abs(arg1 - arg2) > tolerance:
+                return False
+        return True
