@@ -3,9 +3,7 @@ from pydobot import Dobot
 import pydobot
 import time as t
 import sys
-import math
-import struct
-from Change_targets import *
+
 
 
 # -----------------------------------------------Function Part-----------------------------------------------#
@@ -20,7 +18,9 @@ def home_position(device):
 def connection():
     print('- connexion au robot ...', end='')
     sys.stdout.flush()
-    port = 'COM5'  # replacez ici COM3 par votre port de communication
+    available_ports = list_ports.comports()
+    print(f"available ports: {[x.device for x in available_ports]}")
+    port = available_ports[0].device # replacez ici COM3 par votre port de communication
     device = Dobot(port=port)
     print('[ok]')
     sys.stdout.flush()

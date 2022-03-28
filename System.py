@@ -1,5 +1,7 @@
 import time
 
+import pydobot.dobot
+
 from data_struct.General import Position, Faces
 import dobot_extensions
 
@@ -7,12 +9,13 @@ from logic import KaplaOrganizer
 
 tempo = 0.2
 
+
 class System:
     # TODO : setup pos here
     shop_pos: Position = Position(180.06, 91.33, -46.74)
     conveyor_pos_load: Position = Position(178.29, -36.15, 33.56)
     conveyor_pos_unload: Position = Position(189.17, 69.69, 36.42)
-    construction_pos: Position = Position(-2.47, -296.44, -72.85)
+    construction_pos: Position = Position(-46.50, -241.93, 1.77)
     flipper_small_face: Position = Position(188.79, -74.24, -0.55)
     flipper_big_face: Position = Position(188.04, -62.74, -12.22)
     # Add rotation piece localisation
@@ -63,7 +66,7 @@ class System:
             obj_x += x
             obj_y += y
             obj_z += z
-            self.drop(self.builder, Position(obj_x, obj_y, obj_z), [midpoint], angle)
+            self.drop(self.builder, Position(obj_x, obj_y, obj_z), [midpoint], angle - 90)
 
             if input("Enter to continue, q to quit").lower() == 'q':
                 break
@@ -90,29 +93,72 @@ class System:
         self.action(device, pos, False, midpoints, angle)
 
     def action(self, device: dobot_extensions.Dobot, pos: Position, suck: bool, midpoints: list[Position], angle: float = 0):
+        for x, y, z in midpoints:
+            print("Going to midpoint")
+            device.wait_for_cmd(device.move_to(x, y, z))
+            print("Midpoint reached")
+        time.sleep(tempo)
+        print("WANTED ANGLE", angle)
+
+        print("Actual pose :", end="")
+        pretty_print_pose(device.get_pose())
+        print(f" objective (hover) : {pos.get_hover()}")
+        device.wait_for_cmd(device.move_to(*(pos.get_hover()), angle))
+        print("Reached : ", end="")
+        pretty_print_pose(device.get_pose())
+        input("Done ... Continue ?")
+        print("\n")
+        time.sleep(tempo)
+
+
+        print("Actual pose :", end="")
+        pretty_print_pose(device.get_pose())
+        print(f" objective (real) : {pos}")
+        device.speed(100, 100)
+        device.wait_for_cmd(device.move_to(*pos, angle, mode=pydobot.dobot.MODE_PTP.MOVL_XYZ))
+        print("Reached : ", end="")
+        pretty_print_pose(device.get_pose())
+        input("Done ... Continue ?")
+        print("\n")
+        time.sleep(tempo)
+
+        print("Actual pose :", end="")
+        pretty_print_pose(device.get_pose())
+        print(f" objective (suck) : suck")
+        device.wait_for_cmd(device.suck(suck))
+        print("Reached : ", end="")
+        pretty_print_pose(device.get_pose())
+        input("Done ... Continue ?")
+        print("\n")
+        time.sleep(1)
+
+        print("Actual pose :", end="")
+        pretty_print_pose(device.get_pose())
+        print(f" objective (hover) : {pos.get_hover()}")
+        device.wait_for_cmd(device.move_to(*(pos.get_hover()), angle, mode=pydobot.dobot.MODE_PTP.MOVL_XYZ))
+        print("Reached : ", end="")
+        pretty_print_pose(device.get_pose())
+        input("Done ... Continue ?")
+        print("\n")
+        time.sleep(tempo)
+        device.speed(10, 10)
+
+
+def pretty_print_pose(pose):
+    print('(x=%0.2f, y=%0.2f, z=%0.2f r=%0.2f)' % \
+          (pose.position.x, pose.position.y, pose.position.z, pose.position.r), end="")
+
         # for x, y, z in midpoints:
         #     device.wait_for_cmd(device.move_to(x, y, z))
         # time.sleep(tempo)
-        # device.wait_for_cmd(device.move_to(*(pos.get_hover())))
+        # self.my_move_to(device, pos.get_hover())
         # time.sleep(tempo)
-        # device.wait_for_cmd(device.move_to(*pos, angle))
+        # self.my_move_to(device, pos, angle)
         # time.sleep(tempo)
         # device.wait_for_cmd(device.suck(suck))
         # time.sleep(1)
-        # device.wait_for_cmd(device.move_to(*(pos.get_hover())))
+        # self.my_move_to(device, pos.get_hover())
         # time.sleep(tempo)
-
-        for x, y, z in midpoints:
-            device.wait_for_cmd(device.move_to(x, y, z))
-        time.sleep(tempo)
-        self.my_move_to(device, pos.get_hover())
-        time.sleep(tempo)
-        self.my_move_to(device, pos, angle)
-        time.sleep(tempo)
-        device.wait_for_cmd(device.suck(suck))
-        time.sleep(1)
-        self.my_move_to(device, pos.get_hover())
-        time.sleep(tempo)
 
 
     def my_move_to(self, device: dobot_extensions.Dobot, pos: Position, angle: float = 0):
