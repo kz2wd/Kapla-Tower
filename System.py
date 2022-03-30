@@ -15,7 +15,7 @@ class System:
     shop_pos: Position = Position(180.06, 91.33, -46.74)
     conveyor_pos_load: Position = Position(178.29, -36.15, 33.56)
     conveyor_pos_unload: Position = Position(189.17, 69.69, 36.42)
-    construction_pos: Position = Position(-46.50, -241.93, 1.77)
+    construction_pos: Position = Position(-98.85, -298.12, -71.17)
     flipper_small_face: Position = Position(188.79, -74.24, -0.55)
     flipper_big_face: Position = Position(188.04, -62.74, -12.22)
     # Add rotation piece localisation
@@ -52,21 +52,21 @@ class System:
 
             if face == Faces.big_face:
                 retaking_point = System.flipper_big_face
-                self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(100, 100, -1, 0))
+                self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(100, 250, -1, 0))
             elif face == Faces.small_face:
                 retaking_point = System.flipper_small_face
-                self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(100, 100, -1, 0))
-
+                self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(100, 250, -1, 0))
 
             midpoint = Position(151.28, -160.95, 150.53)
-            self.catch(self.builder, retaking_point, [midpoint])
+            catching_angle = -100
+            self.catch(self.builder, retaking_point, [midpoint], catching_angle)
 
             obj_x, obj_y, obj_z = System.construction_pos
             x, y, z = pos
             obj_x += x
             obj_y += y
             obj_z += z
-            self.drop(self.builder, Position(obj_x, obj_y, obj_z), [midpoint], angle - 90)
+            self.drop(self.builder, Position(obj_x, obj_y, obj_z), [midpoint], catching_angle + angle)
 
             if input("Enter to continue, q to quit").lower() == 'q':
                 break
@@ -95,7 +95,7 @@ class System:
     def action(self, device: dobot_extensions.Dobot, pos: Position, suck: bool, midpoints: list[Position], angle: float = 0):
         for x, y, z in midpoints:
             print("Going to midpoint")
-            device.wait_for_cmd(device.move_to(x, y, z))
+            device.wait_for_cmd(device.move_to(x, y, z, angle))
             print("Midpoint reached")
         time.sleep(tempo)
         print("WANTED ANGLE", angle)
@@ -147,27 +147,3 @@ class System:
 def pretty_print_pose(pose):
     print('(x=%0.2f, y=%0.2f, z=%0.2f r=%0.2f)' % \
           (pose.position.x, pose.position.y, pose.position.z, pose.position.r), end="")
-
-        # for x, y, z in midpoints:
-        #     device.wait_for_cmd(device.move_to(x, y, z))
-        # time.sleep(tempo)
-        # self.my_move_to(device, pos.get_hover())
-        # time.sleep(tempo)
-        # self.my_move_to(device, pos, angle)
-        # time.sleep(tempo)
-        # device.wait_for_cmd(device.suck(suck))
-        # time.sleep(1)
-        # self.my_move_to(device, pos.get_hover())
-        # time.sleep(tempo)
-
-
-    def my_move_to(self, device: dobot_extensions.Dobot, pos: Position, angle: float = 0):
-        pose = device.get_pose()
-        while self.equals_poses(pose, device.get_pose()):
-            device.wait_for_cmd(device.move_to(*pos, angle))
-
-    def equals_poses(self, pose1, pose2, tolerance=2):
-        for arg1, arg2 in zip(pose1.position, pose2.position):
-            if abs(arg1 - arg2) > tolerance:
-                return False
-        return True
