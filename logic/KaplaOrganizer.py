@@ -17,18 +17,21 @@ def get_sequence():
     ang = []
     face = []
 
-    dic_ang = {}
-    dic_ang[(20, 25, 70)] = 0
-    dic_ang[(25, 20, 70)] = 90
-    dic_ang[(20, 70, 25)] = 0
-    dic_ang[(70, 20, 25)] = 90
-    dic_ang[(25, 70, 20)] = 0
-    dic_ang[(70, 25, 20)] = 90
+    # Je les ai inversé c'est mieux (Youri)
+    dic_ang = {
+        (20, 25, 70): 90,
+        (25, 20, 70): 0,
+        (20, 70, 25): 90,
+        (70, 20, 25): 0,
+        (25, 70, 20): 90,
+        (70, 25, 20): 0
+    }
 
-    dic_face = {}
-    dic_face[70] = 'small_face'
-    dic_face[25] = 'medium_face'
-    dic_face[20] = 'big_face'
+    dic_face = {
+        70: 'small_face',
+        25: 'medium_face',
+        20: 'big_face'
+    }
 
     for i in range(len(kapla_list)):
         if kapla_list[i]["attitude"][2] == 20:
@@ -52,20 +55,34 @@ def get_sequence():
         del kapla_list[suppr]
 
     for i in range(len(data_tri)):
+        # Angle
+        angle = dic_ang[tuple(data_tri[i]['attitude'])] + data_tri[i]['pivot']
+        angle = angle % 180
+        ang.append(angle)
 
-        ang_1 = data_tri[i]["attitude"][0]
-        ang_2 = data_tri[i]["attitude"][1]
-        ang_3 = data_tri[i]["attitude"][2]
-        ang.append(dic_ang[(ang_1,ang_2,ang_3)] + data_tri[i]["pivot"])
+        # Position
+        pos_z = (data_tri[i]["base"][2] + (data_tri[i]["attitude"][2]))
 
-        pos_x = ( data_tri[i]["base"][0] + ( data_tri[i]["attitude"][0]/2 ))
-        pos_y = ( data_tri[i]["base"][1] + ( data_tri[i]["attitude"][1]/2 ))
-        pos_z = ( data_tri[i]["base"][2] + ( data_tri[i]["attitude"][2] ))
+        pos_x, pos_y = robot_to_world(data_tri[i]['pivot'],
+                                      data_tri[i]["base"][0], data_tri[i]["base"][1],
+                                      data_tri[i]["attitude"][0] / 2, data_tri[i]["attitude"][1] / 2)
+
         pos.append((pos_x, pos_y, pos_z))
 
         face.append(dic_face[data_tri[i]["attitude"][2]])
 
-    while(1):
-        for i in range(len(data)):
-            yield (pos[i], ang[i], face[i])
-        pass
+    for i in range(len(data)):
+        yield pos[i], ang[i], face[i]
+
+
+import math
+import numpy as np
+
+
+# Om = R * Or + Pr
+def robot_to_world(robot_in_world_angle, robot_in_world_x, robot_in_world_y, object_in_robot_x, object_in_robot_y):  # Angle en degré
+    alpha = math.radians(robot_in_world_angle)  # Conversion en rad
+    pos_robot_in_world = np.array([robot_in_world_x, robot_in_world_y])  # Position Robot dans le repère Monde
+    pos_object_in_robot = np.array([object_in_robot_x, object_in_robot_y])  # Position objet dans le repère Robot
+    R = np.array([[math.cos(alpha), math.sin(-alpha)], [math.sin(alpha), math.cos(alpha)]])
+    return R @ pos_object_in_robot + pos_robot_in_world
