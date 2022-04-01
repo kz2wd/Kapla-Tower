@@ -7,8 +7,6 @@ import dobot_extensions
 # Personal import
 from System import *
 
-VISUALIZE = False
-
 
 if __name__ == "__main__":
     print("Starting robot")
@@ -22,10 +20,7 @@ if __name__ == "__main__":
 
     system = System(device1, device2, device1)
 
-    if VISUALIZE:
-        Visualizer.visualize(system.start())
-    else:
-        system.start()
+    system.start()
 
     device1.close()
     device2.close()
