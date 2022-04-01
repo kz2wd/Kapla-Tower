@@ -32,21 +32,52 @@ class Pipeline:
 def draw_kapla(pos, angle, face: Faces):
     kapla_edges = []
     kapla_vertices = []
+    x, y, z = pos
 
+    # Get how is the Kapla
+    shift_x, shift_y, shift_z = 0, 0, 0
     if face == face.big_face:
-        pass
+        shift_x, shift_y, shift_z = 20, 70, 24
+    elif face == face.medium_face:
+        shift_x, shift_y, shift_z = 24, 70, 20
+    elif face == face.small_face:
+        shift_x, shift_y, shift_z = 70, 24, 20
 
+    # Add the points
+
+    kapla_edges.append((x, y, z))
+    kapla_edges.append((x, y, z + shift_z))
+    kapla_edges.append((x, y + shift_y, z + shift_z))
+    kapla_edges.append((x, y + shift_y, z))
+    kapla_edges.append((x + shift_x, y + shift_y, z))
+    kapla_edges.append((x + shift_x, y + shift_y, z + shift_z))
+    kapla_edges.append((x + shift_x, y, z + shift_z))
+    kapla_edges.append((x + shift_x, y, z))
+
+    kapla_vertices.append((0, 1))
+    kapla_vertices.append((1, 2))
+    kapla_vertices.append((2, 3))
+    kapla_vertices.append((3, 0))
+
+    kapla_vertices.append((7, 6))
+    kapla_vertices.append((6, 5))
+    kapla_vertices.append((5, 4))
+    kapla_vertices.append((4, 7))
+
+    kapla_vertices.append((0, 7))
+    kapla_vertices.append((1, 6))
+    kapla_vertices.append((2, 5))
+    kapla_vertices.append((3, 4))
 
     return kapla_edges, kapla_vertices
 
 
-
 def display_structure(edges, vertices):
-
     glBegin(GL_LINES)
-    for edge in edges:
-        for vertex in edge:
-            glVertex3fv(vertices[vertex])
+    for i in range(len(edges)):
+        for edge in edges[i]:
+            for vertex in edge:
+                glVertex3fv(vertices[i][vertex])
     glEnd()
 
 
@@ -85,12 +116,15 @@ def pygame_drawer(pipeline: Pipeline):
         kapla_to_draw = pipeline.get_content()
         edges, vertices = [], []
 
+        print(f"")
+
         for kapla in kapla_to_draw:
             temp_edges, temp_vertices = draw_kapla(*kapla)
-            edges += temp_edges
-            vertices += temp_vertices
+            edges.append(temp_edges)
+            vertices.append(temp_vertices)
 
         # Update edges and vertices
+        print(f"edges : {len(edges)}, vertices {len(vertices)}, len kapla : {len(kapla_to_draw)}")
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         display_structure(edges, vertices)

@@ -23,7 +23,7 @@ if __name__ == "__main__":
     system = System(device1, device2, device1)
 
     if VISUALIZE:
-        Visualizer.visualize(system.start())
+        Visualizer.visualize(system.start)
     else:
         system.start()
 

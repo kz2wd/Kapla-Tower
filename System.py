@@ -22,9 +22,9 @@ CONVEYOR_PRECISION_SPEED = 30
 
 class System:
     # TODO : setup pos here
-    shop_pos: Position = Position(188.93, 90.08, -48.05)
-    conveyor_pos_load: Position = Position(189.72, -129.83, 32.77)
-    conveyor_pos_unload: Position = Position(200.49, 74.91, 34.90)
+    shop_pos: Position = Position(188.93, 90.08, -50.05)
+    conveyor_pos_load: Position = Position(189.72, -129.83, 35.77)
+    conveyor_pos_unload: Position = Position(190.27, 73.10, 34.80)
     construction_pos: Position = Position(-98.85, -298.12, -71.17)
     flipper_small_face: Position = Position(193.12, -78.12, 3.88)
     flipper_big_face: Position = Position(190.60, -66.14, -7.24)
@@ -51,7 +51,9 @@ class System:
         kapla_sequence = KaplaOrganizer.get_sequence()
 
         if pipeline is not None:
+            print("SETTING CONTENT : ", kapla_sequence, len(kapla_sequence))
             pipeline.set_content(kapla_sequence)
+
 
         for pos, angle, face in kapla_sequence:
 
@@ -63,7 +65,7 @@ class System:
             # Travel on conveyor
             self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(CONVEYOR_SPEED, 400, -1, 0))
             time.sleep(0.1)
-
+            input("stoped")
             # Rotation
             retaking_point = System.conveyor_pos_unload
 
@@ -93,6 +95,48 @@ class System:
                     break
 
         print("Construction finished")
+
+    def start(self):
+
+        self.builder.speed(SPEED, ACCELERATION)
+        self.loader.speed(SPEED, ACCELERATION)
+        input("Enter to start !")
+
+        kapla_sequence = KaplaOrganizer.get_sequence()
+        for pos, angle, face in kapla_sequence:
+
+            # Loading part
+            self.get_kapla_from_shop(face)
+
+            # Travel on conveyor
+            self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(CONVEYOR_SPEED, 400, -1, 0))
+            time.sleep(0.1)
+
+            # Rotation
+            retaking_point = System.conveyor_pos_unload
+
+            if face == Faces.big_face:
+                retaking_point = System.flipper_big_face
+                self.conveyor_handler.wait_for_cmd(
+                    self.conveyor_handler.conveyor_belt_distance(CONVEYOR_PRECISION_SPEED, 150, -1, 0))
+            elif face == Faces.small_face:
+                retaking_point = System.flipper_small_face
+                self.conveyor_handler.wait_for_cmd(
+                    self.conveyor_handler.conveyor_belt_distance(CONVEYOR_PRECISION_SPEED, 150, -1, 0))
+
+            # Builder taking the Kapla
+            midpoint = Position(151.28, -160.95, 170.53)
+            midpoint2 = Position(185.53, -57.64, 152.09)
+            catching_angle = -90
+            self.catch(self.builder, retaking_point, [midpoint, midpoint2], catching_angle)
+
+            obj_x, obj_y, obj_z = System.construction_pos
+            x, y, z = pos
+            obj_x += x
+            obj_y += y
+            obj_z += z
+            # Unload Kapla on construction site
+            self.drop(self.builder, Position(obj_x, obj_y, obj_z), [midpoint], catching_angle + angle)
 
     def get_kapla_from_shop(self, face: Faces):
 
