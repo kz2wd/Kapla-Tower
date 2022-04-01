@@ -49,11 +49,11 @@ def draw_kapla(pos, angle, face: Faces):
     # Get how is the Kapla
     shift_x, shift_y, shift_z = 0, 0, 0
     if face == Faces.big_face:
-        shift_x, shift_y, shift_z = 70, 20, 25
+        shift_x, shift_y, shift_z = 25, 20, 70
     elif face == Faces.small_face:
-        shift_x, shift_y, shift_z = 25, 70, 20
+        shift_x, shift_y, shift_z = 20, 70, 25
     elif face == Faces.medium_face:
-        shift_x, shift_y, shift_z = 70, 25, 20
+        shift_x, shift_y, shift_z = 20, 25, 70
 
     # Add the points
 
@@ -61,7 +61,7 @@ def draw_kapla(pos, angle, face: Faces):
     y = y / RATIO
     z = z / RATIO
     shift_x = shift_x / RATIO
-    shift_y = shift_y / RATIO
+    shift_y = -shift_y / RATIO
     shift_z = shift_z / RATIO
 
 
@@ -89,6 +89,7 @@ def draw_kapla(pos, angle, face: Faces):
     kapla_edges.append((2, 5))
     kapla_edges.append((3, 4))
 
+    angle = math.radians(angle)
     for i in range(len(kapla_vertices)):
         tx, ty, tz = kapla_vertices[i]
         tx, tz = robot_to_world(angle, x, z, tx, tz)
@@ -148,6 +149,11 @@ def pygame_drawer():
                 if event.key == pygame.K_DOWN:
                     glTranslatef(0, 0, -1)
 
+                if event.key == pygame.K_a:
+                    glRotatef(1, 0, 1, 0)
+                if event.key == pygame.K_e:
+                    glRotatef(1, 0, -1, 0)
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 4:
                     glTranslatef(0, -0.2, 0)
@@ -168,11 +174,10 @@ def pygame_drawer():
             add_edges(edges, vertices, temp_edges, temp_vertices)
 
         # Update edges and vertices
-        print(f"edges : {len(edges)}, vertices {len(vertices)}, len kapla : {len(kapla_to_draw)}")
+        # print(f"edges : {len(edges)}, vertices {len(vertices)}, len kapla : {len(kapla_to_draw)}")
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         display_structure(edges, vertices)
-        glRotatef(1, 0, 1, 0)
         pygame.display.flip()
         pygame.time.wait(15)
 

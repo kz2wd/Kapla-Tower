@@ -6,5 +6,5 @@
  {"pivot": 0, "base": [0, 25, 0], "attitude": [25, 70, 20]},
  {"pivot": 0, "base": [0, 0, 20], "attitude": [20, 25, 70]},
  {"pivot": 0, "base": [75, 0, 20], "attitude": [20, 25, 70]},
- {"pivot": 0, "base": [75, 70, 20], "attitude": [20, 25, 70]},
- {"pivot": 0, "base": [0, 70, 20], "attitude": [20, 25, 70]}]
+ {"pivot": 0, "base": [0, 70, 20], "attitude": [20, 25, 70]},
+ {"pivot": 0, "base": [75, 70, 20], "attitude": [20, 25, 70]}]
