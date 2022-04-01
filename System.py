@@ -42,18 +42,13 @@ class System:
         self.builder.set_home(250.0, 0.0, 100.0)
         self.builder.wait_for_cmd(self.builder.home())
 
-    def start(self, pipeline: Pipeline = None):
+    def start(self):
 
         self.builder.speed(SPEED, ACCELERATION)
         self.loader.speed(SPEED, ACCELERATION)
         input("Enter to start !")
 
         kapla_sequence = KaplaOrganizer.get_sequence()
-
-        if pipeline is not None:
-            print("SETTING CONTENT : ", kapla_sequence, len(kapla_sequence))
-            pipeline.set_content(kapla_sequence)
-
 
         for pos, angle, face in kapla_sequence:
 
