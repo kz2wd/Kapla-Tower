@@ -7,7 +7,7 @@ import dobot_extensions
 # Personal import
 from System import *
 
-VISUALIZE = True
+VISUALIZE = False
 
 
 if __name__ == "__main__":

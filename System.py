@@ -8,13 +8,13 @@ import dobot_extensions
 
 from logic import KaplaOrganizer
 
-tempo = 0.2
+tempo = 0.1
 
-AUTO = False
+AUTO = True
 DEBUG = True
-SPEED = 10
+SPEED = 25
 ACCELERATION = 10
-TAKE_SPEED = 100
+TAKE_SPEED = 150
 TAKE_ACCELERATION = 100
 CONVEYOR_SPEED = 100
 CONVEYOR_PRECISION_SPEED = 30
@@ -22,12 +22,12 @@ CONVEYOR_PRECISION_SPEED = 30
 
 class System:
     # TODO : setup pos here
-    shop_pos: Position = Position(184.94, 90.60, -47.31)
-    conveyor_pos_load: Position = Position(178.29, -36.15, 33.56)
-    conveyor_pos_unload: Position = Position(189.17, 69.69, 36.42)
+    shop_pos: Position = Position(188.93, 90.08, -48.05)
+    conveyor_pos_load: Position = Position(189.72, -129.83, 32.77)
+    conveyor_pos_unload: Position = Position(200.49, 74.91, 34.90)
     construction_pos: Position = Position(-98.85, -298.12, -71.17)
-    flipper_small_face: Position = Position(187.19, -76.02, 2.87)
-    flipper_big_face: Position = Position(188.20, -60.77, -8.63)
+    flipper_small_face: Position = Position(193.12, -78.12, 3.88)
+    flipper_big_face: Position = Position(190.60, -66.14, -7.24)
 
     # Add rotation piece localisation
 
@@ -45,6 +45,7 @@ class System:
     def start(self, pipeline: Pipeline = None):
 
         self.builder.speed(SPEED, ACCELERATION)
+        self.loader.speed(SPEED, ACCELERATION)
         input("Enter to start !")
 
         kapla_sequence = KaplaOrganizer.get_sequence()
@@ -60,7 +61,7 @@ class System:
             self.get_kapla_from_shop(face)
 
             # Travel on conveyor
-            self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(CONVEYOR_SPEED, 500, -1, 0))
+            self.conveyor_handler.wait_for_cmd(self.conveyor_handler.conveyor_belt_distance(CONVEYOR_SPEED, 400, -1, 0))
             time.sleep(0.1)
 
             # Rotation
@@ -91,13 +92,15 @@ class System:
                 if input("Enter to continue, q to quit").lower() == 'q':
                     break
 
+        print("Construction finished")
+
     def get_kapla_from_shop(self, face: Faces):
 
         angle = 0
         if face == Faces.small_face:
             angle = 90
 
-        midpoint = Position(193.17, 7.59, 94.41)
+        midpoint = Position(294.16, -3.40, 90.00)
         catch_shift = -90
 
         self.catch(self.loader, System.shop_pos, [midpoint], catch_shift)
